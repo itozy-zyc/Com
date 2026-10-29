@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BiHuynhRoblox - Shop Acc Roblox Uy Tín</title>
+    <title>Gamepass24h.com - Shop Roblox Uy Tín</title>
     <style>
         * {
             box-sizing: border-box;
@@ -17,18 +17,21 @@
         }
         /* Header */
         header {
-            background: #fff;
+            background: #111;
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 10px 20px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
             position: sticky;
             top: 0;
             z-index: 100;
         }
-        .logo img {
-            height: 40px;
+        .logo {
+            color: #ffcc00;
+            font-weight: bold;
+            font-size: 18px;
+            text-transform: uppercase;
         }
         .btn-login {
             background-color: #e74c3c;
@@ -37,17 +40,29 @@
             border-radius: 5px;
             text-decoration: none;
             font-weight: bold;
+            cursor: pointer;
+            border: none;
         }
 
-        /* Banner */
+        /* Banner Gamepass24h */
         .banner {
             width: 100%;
-            max-height: 200px;
-            overflow: hidden;
+            background: linear-gradient(135deg, #b71c1c, #d32f2f, #f57c00);
+            padding: 20px 10px;
+            text-align: center;
+            color: white;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
-        .banner img {
-            width: 100%;
-            display: block;
+        .banner h1 {
+            font-size: 22px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            color: #ffeb3b;
+        }
+        .banner p {
+            font-size: 13px;
+            font-weight: bold;
         }
 
         /* Container */
@@ -100,59 +115,86 @@
             text-transform: uppercase;
         }
 
-        /* Tiêu đề danh mục */
-        .section-title {
-            color: #e74c3c;
-            font-size: 18px;
-            margin: 20px 0 10px 0;
-            text-transform: uppercase;
-            border-left: 4px solid #e74c3c;
-            padding-left: 8px;
-        }
-
-        /* Lưới sản phẩm */
-        .grid-products {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-        }
-        .product-card {
-            background: #fff;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            border: 1px solid #eee;
-        }
-        .product-card img {
+        /* Modal Đăng nhập / Đăng ký */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
             width: 100%;
-            height: 110px;
-            object-fit: cover;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            justify-content: center;
+            align-items: center;
         }
-        .product-info {
+        .modal-content {
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            width: 90%;
+            max-width: 350px;
+            position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            font-size: 20px;
+            cursor: pointer;
+            color: #aaa;
+        }
+        .modal-tabs {
+            display: flex;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #eee;
+        }
+        .tab {
+            flex: 1;
+            text-align: center;
             padding: 10px;
-        }
-        .product-name {
-            font-size: 13px;
             font-weight: bold;
-            height: 35px;
-            overflow: hidden;
-            margin-bottom: 5px;
+            cursor: pointer;
+            color: #77f;
         }
-        .product-price {
+        .tab.active {
             color: #e74c3c;
-            font-size: 13px;
-            margin-bottom: 8px;
+            border-bottom: 2px solid #e74c3c;
+            margin-bottom: -2px;
         }
-        .btn-buy {
+        .form-group {
+            margin-bottom: 12px;
+        }
+        .form-group label {
             display: block;
+            font-size: 13px;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+        .btn-submit {
+            width: 100%;
             background-color: #e74c3c;
             color: white;
-            text-align: center;
-            padding: 6px;
-            border-radius: 4px;
-            text-decoration: none;
-            font-size: 12px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
             font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .form-box {
+            display: none;
+        }
+        .form-box.active {
+            display: block;
         }
     </style>
 </head>
@@ -160,15 +202,14 @@
 
     <!-- Header -->
     <header>
-        <div class="logo">
-            <strong>BIHUYNH</strong>
-        </div>
-        <a href="#" class="btn-login">ĐĂNG NHẬP</a>
+        <div class="logo">GAMEPASS24H.COM</div>
+        <button class="btn-login" onclick="openModal()">ĐĂNG NHẬP</button>
     </header>
 
-    <!-- Banner -->
+    <!-- Banner Gamepass24h -->
     <div class="banner">
-        <img src="https://via.placeholder.com/600x200/333/fff?text=Banner+Shop+Roblox" alt="Banner">
+        <h1>GAMEPASS24H.COM</h1>
+        <p>⚡ Chuyên Mua Bán Robux, Gamepass, Cày Thuê Blox Fruit Uy Tín ⚡</p>
     </div>
 
     <div class="container">
@@ -190,30 +231,83 @@
         </div>
 
         <a href="#" class="btn-nap">NẠP THẺ NGAY</a>
+    </div>
 
-        <!-- Danh mục sản phẩm -->
-        <div class="section-title">Mua Robux</div>
-        <div class="grid-products">
-            <!-- Sản phẩm 1 -->
-            <div class="product-card">
-                <img src="https://via.placeholder.com/300x150/ff4d4d/fff?text=Robux+120H" alt="Robux">
-                <div class="product-info">
-                    <div class="product-name">ROBUX 120H GAMEPASS</div>
-                    <div class="product-price">Đã bán: 12.490</div>
-                    <a href="#" class="btn-buy">Đang Giảm Giá 70%</a>
-                </div>
+    <!-- Modal Đăng Nhập / Đăng Ký -->
+    <div id="authModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-tabs">
+                <div class="tab active" onclick="switchTab('login')">Đăng Nhập</div>
+                <div class="tab" onclick="switchTab('register')">Đăng Ký</div>
             </div>
-            <!-- Sản phẩm 2 -->
-            <div class="product-card">
-                <img src="https://via.placeholder.com/300x150/ff4d4d/fff?text=Robux+VNG" alt="Robux">
-                <div class="product-info">
-                    <div class="product-name">ROBUX VNG AUTO</div>
-                    <div class="product-price">Đã bán: 5.037</div>
-                    <a href="#" class="btn-buy">Đang Giảm Giá 70%</a>
+
+            <!-- Form Đăng Nhập -->
+            <div id="loginForm" class="form-box active">
+                <div class="form-group">
+                    <label>Tài khoản / Email</label>
+                    <input type="text" placeholder="Nhập tài khoản...">
                 </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" placeholder="Nhập mật khẩu...">
+                </div>
+                <button class="btn-submit">ĐĂNG NHẬP</button>
+            </div>
+
+            <!-- Form Đăng Ký -->
+            <div id="registerForm" class="form-box">
+                <div class="form-group">
+                    <label>Tài khoản mới</label>
+                    <input type="text" placeholder="Chọn tên tài khoản...">
+                </div>
+                <div class="form-group">
+                    <label>Mật khẩu</label>
+                    <input type="password" placeholder="Tạo mật khẩu...">
+                </div>
+                <div class="form-group">
+                    <label>Nhập lại mật khẩu</label>
+                    <input type="password" placeholder="Xác nhận mật khẩu...">
+                </div>
+                <button class="btn-submit">ĐĂNG KÝ</button>
             </div>
         </div>
     </div>
+
+    <script>
+        const modal = document.getElementById('authModal');
+        
+        function openModal() {
+            modal.style.display = 'flex';
+        }
+
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+
+        // Bấm ra ngoài modal thì tự động đóng
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                closeModal();
+            }
+        }
+
+        function switchTab(tabName) {
+            const tabs = document.querySelectorAll('.tab');
+            const forms = document.querySelectorAll('.form-box');
+
+            tabs.forEach(t => t.classList.remove('active'));
+            forms.forEach(f => f.classList.remove('active'));
+
+            if (tabName === 'login') {
+                tabs[0].classList.add('active');
+                document.getElementById('loginForm').classList.add('active');
+            } else {
+                tabs[1].classList.add('active');
+                document.getElementById('registerForm').classList.add('active');
+            }
+        }
+    </script>
 
 </body>
 </html>
