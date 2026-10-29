@@ -3,39 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Subway Surfers HTML 3D</title>
+    <title>Subway Surfers - Vuốt Cảm Ứng</title>
     <style>
         body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: 'Arial', sans-serif; touch-action: none;}
         canvas { display: block; }
         #ui-layer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
-        #score { position: absolute; top: 20px; left: 20px; color: white; font-size: 30px; font-weight: 900; text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000, 1px 1px 0 #000; }
-        #game-over { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.8); color: white; padding: 30px; text-align: center; border-radius: 15px; display: none; pointer-events: auto; border: 2px solid #fff;}
-        button { padding: 10px 25px; font-size: 20px; cursor: pointer; background: #2ecc71; color: white; border: none; border-radius: 5px; font-weight: bold; margin-top: 15px;}
-        .controls { position: absolute; bottom: 20px; width: 100%; display: flex; justify-content: space-between; padding: 0 30px; box-sizing: border-box; pointer-events: auto;}
-        .btn { background: rgba(255, 255, 255, 0.4); border: 2px solid white; color: white; font-size: 24px; padding: 15px 20px; border-radius: 50%; user-select: none; }
+        #score { position: absolute; top: 20px; left: 20px; color: white; font-size: 30px; font-weight: 900; text-shadow: 2px 2px 0 #000; }
+        #game-over { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(0,0,0,0.85); color: white; padding: 30px; text-align: center; border-radius: 15px; display: none; pointer-events: auto; border: 2px solid #fff; width: 80%; max-width: 300px;}
+        button { padding: 12px 25px; font-size: 20px; cursor: pointer; background: #2ecc71; color: white; border: none; border-radius: 8px; font-weight: bold; margin-top: 15px; width: 100%;}
+        
+        /* Ẩn các nút điều khiển, chỉ hiện hướng dẫn lúc đầu */
+        #tutorial { position: absolute; bottom: 30px; width: 100%; text-align: center; color: white; font-size: 16px; text-shadow: 1px 1px 2px #000; transition: opacity 1s; }
     </style>
 </head>
 <body>
 
     <div id="ui-layer">
         <div id="score">Điểm: 0</div>
+        <div id="tutorial">Vuốt: ⬅️ ➡️ Đổi làn | ⬆️ Nhảy | ⬇️ Lướt</div>
         <div id="game-over">
             <h1>BẠN ĐÃ THUA!</h1>
             <button onclick="resetGame()">CHƠI LẠI</button>
         </div>
-        
-        <!-- Nút điều khiển cho điện thoại -->
-        <div class="controls">
-            <button class="btn" ontouchstart="move('left')" onclick="move('left')">⬅️</button>
-            <div style="display:flex; flex-direction:column; gap:10px;">
-                <button class="btn" ontouchstart="move('jump')" onclick="move('jump')">⬆️ Nhảy</button>
-                <button class="btn" ontouchstart="move('slide')" onclick="move('slide')">⬇️ Lướt</button>
-            </div>
-            <button class="btn" ontouchstart="move('right')" onclick="move('right')">➡️</button>
-        </div>
     </div>
 
-    <!-- Tải các thư viện cần thiết -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
@@ -43,7 +34,7 @@
         // 1. KHỞI TẠO CẢNH
         const scene = new THREE.Scene();
         scene.background = new THREE.Color(0x87CEEB);
-        scene.fog = new THREE.Fog(0x87CEEB, 30, 120);
+        scene.fog = new THREE.Fog(0x87CEEB, 40, 120); // Sương mù xa hơn để dễ nhìn
 
         const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.position.set(0, 6, 12);
@@ -55,30 +46,29 @@
         document.body.appendChild(renderer.domElement);
 
         // Ánh sáng
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
         scene.add(ambientLight);
-        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
         dirLight.position.set(10, 20, 10);
         dirLight.castShadow = true;
         scene.add(dirLight);
 
-        // 2. MÔI TRƯỜNG (ĐƯỜNG RAY)
+        // 2. MÔI TRƯỜNG
         const laneWidth = 3.5;
         const LANES = [-laneWidth, 0, laneWidth];
         
-        // Mặt đất
         const floorGeo = new THREE.PlaneGeometry(laneWidth * 3, 500);
-        const floorMat = new THREE.MeshLambertMaterial({ color: 0x888888 });
+        const floorMat = new THREE.MeshLambertMaterial({ color: 0x7f8c8d });
         const floor = new THREE.Mesh(floorGeo, floorMat);
         floor.rotation.x = -Math.PI / 2;
         floor.position.z = -200;
         floor.receiveShadow = true;
         scene.add(floor);
 
-        // Thanh ray (vẽ sọc ngang để tạo cảm giác chuyển động)
-        for(let i = -250; i < 50; i+= 4) {
-            const barGeo = new THREE.PlaneGeometry(laneWidth * 3, 0.5);
-            const barMat = new THREE.MeshLambertMaterial({ color: 0x666666 });
+        // Vạch kẻ đường
+        for(let i = -250; i < 50; i+= 6) {
+            const barGeo = new THREE.PlaneGeometry(laneWidth * 3, 0.3);
+            const barMat = new THREE.MeshLambertMaterial({ color: 0x95a5a6 });
             const bar = new THREE.Mesh(barGeo, barMat);
             bar.rotation.x = -Math.PI / 2;
             bar.position.set(0, 0.01, i);
@@ -94,32 +84,30 @@
         let targetY = 1.5;
         let currentLane = 1;
         
-        // Tải mô hình nhân vật 3D từ mạng (Dùng tạm mô hình Robot cho có hồn)
         const loader = new THREE.GLTFLoader();
         loader.load('https://threejs.org/examples/models/gltf/RobotExpressive/RobotExpressive.glb', function (gltf) {
             player = gltf.scene;
             player.scale.set(0.5, 0.5, 0.5);
             player.position.set(0, 1.5, 5);
-            player.rotation.y = Math.PI; // Quay mặt về phía trước
+            player.rotation.y = Math.PI;
             player.castShadow = true;
             scene.add(player);
 
-            // Hoạt ảnh
             mixer = new THREE.AnimationMixer(player);
             const animations = gltf.animations;
             actions['run'] = mixer.clipAction(THREE.AnimationClip.findByName(animations, 'Running'));
             actions['jump'] = mixer.clipAction(THREE.AnimationClip.findByName(animations, 'Jump'));
-            actions['slide'] = mixer.clipAction(THREE.AnimationClip.findByName(animations, 'Dance')); // Dùng tạm điệu nhảy làm lướt
+            actions['slide'] = mixer.clipAction(THREE.AnimationClip.findByName(animations, 'Dance'));
             
             if(actions['run']) actions['run'].play();
         });
 
-        // 4. TÀU HỎA (Vật cản)
+        // 4. TÀU HỎA
         let obstacles = [];
-        const trainGeo = new THREE.BoxGeometry(2.5, 4, 10);
+        const trainGeo = new THREE.BoxGeometry(2.5, 4, 12); // Tàu dài hơn
         const trainMat = new THREE.MeshLambertMaterial({ color: 0xe74c3c });
-        const trainTopGeo = new THREE.BoxGeometry(2.2, 1, 9);
-        const trainTopMat = new THREE.MeshLambertMaterial({ color: 0xffffff });
+        const trainTopGeo = new THREE.BoxGeometry(2.2, 1, 11);
+        const trainTopMat = new THREE.MeshLambertMaterial({ color: 0xecf0f1 });
 
         function spawnTrain() {
             const lane = Math.floor(Math.random() * 3);
@@ -134,25 +122,30 @@
             
             trainGroup.add(body);
             trainGroup.add(top);
-            trainGroup.position.set(LANES[lane], 0, -100);
+            trainGroup.position.set(LANES[lane], 0, -120);
             scene.add(trainGroup);
             obstacles.push(trainGroup);
         }
 
         // 5. LOGIC GAME
         let score = 0;
-        let gameSpeed = 0.8;
+        let baseSpeed = 0.4; // Tốc độ cơ bản chậm hơn
+        let currentSpeed = baseSpeed;
         let isGameOver = false;
         const scoreEl = document.getElementById('score');
         const gameOverEl = document.getElementById('game-over');
+        const tutorialEl = document.getElementById('tutorial');
+
+        // Ẩn hướng dẫn sau 5 giây
+        setTimeout(() => { tutorialEl.style.opacity = 0; }, 5000);
 
         function move(dir) {
             if (isGameOver || !player) return;
             
             if (dir === 'left' && currentLane > 0) currentLane--;
-            if (dir === 'right' && currentLane < 2) currentLane++;
+            else if (dir === 'right' && currentLane < 2) currentLane++;
             
-            if (dir === 'jump' && !isJumping && !isSliding) {
+            else if (dir === 'jump' && !isJumping && !isSliding) {
                 isJumping = true;
                 targetY = 4.5;
                 if(actions['jump']) {
@@ -160,11 +153,10 @@
                     actions['jump'].reset().play();
                 }
             }
-            
-            if (dir === 'slide' && !isJumping && !isSliding) {
+            else if (dir === 'slide' && !isJumping && !isSliding) {
                 isSliding = true;
                 targetY = 0.5;
-                player.rotation.x = -Math.PI / 4; // Nằm xuống
+                player.rotation.x = -Math.PI / 4;
                 if(actions['slide']) {
                     actions['run'].stop();
                     actions['slide'].reset().play();
@@ -172,7 +164,7 @@
             }
         }
 
-        // Phím máy tính
+        // Điều khiển bằng phím (Máy tính)
         document.addEventListener('keydown', (e) => {
             if (e.key === 'ArrowLeft' || e.key === 'a') move('left');
             if (e.key === 'ArrowRight' || e.key === 'd') move('right');
@@ -180,26 +172,29 @@
             if (e.key === 'ArrowDown' || e.key === 's') move('slide');
         });
 
-        // Vuốt cảm ứng
+        // Điều khiển bằng Vuốt (Điện thoại)
         let touchStartX = 0, touchStartY = 0;
         document.addEventListener('touchstart', e => {
             touchStartX = e.changedTouches[0].screenX;
             touchStartY = e.changedTouches[0].screenY;
-        });
+        }, {passive: true});
+        
         document.addEventListener('touchend', e => {
+            if (isGameOver) return;
             let touchEndX = e.changedTouches[0].screenX;
             let touchEndY = e.changedTouches[0].screenY;
             let diffX = touchEndX - touchStartX;
             let diffY = touchEndY - touchStartY;
 
-            if (Math.abs(diffX) > Math.abs(diffY)) {
-                if (diffX > 30) move('right');
-                else if (diffX < -30) move('left');
-            } else {
-                if (diffY < -30) move('jump');
-                else if (diffY > 30) move('slide');
+            // Yêu cầu vuốt một đoạn đủ dài (40px) để tránh bấm nhầm
+            if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 40) {
+                if (diffX > 0) move('right');
+                else move('left');
+            } else if (Math.abs(diffY) > Math.abs(diffX) && Math.abs(diffY) > 40) {
+                if (diffY < 0) move('jump');
+                else move('slide');
             }
-        });
+        }, {passive: true});
 
         // 6. VÒNG LẶP GAME
         const clock = new THREE.Clock();
@@ -211,53 +206,50 @@
             if (!isGameOver && player) {
                 if (mixer) mixer.update(delta);
 
-                // Cập nhật điểm
+                // Tăng điểm và tốc độ từ từ
                 score += 1;
-                if (score % 10 === 0) scoreEl.innerText = "Điểm: " + Math.floor(score/10);
+                if (score % 10 === 0) {
+                    scoreEl.innerText = "Điểm: " + Math.floor(score/10);
+                    currentSpeed += 0.002; // Tăng tốc rất nhẹ để không bị sốc
+                }
 
-                // Di chuyển mượt sang làn
+                // Di chuyển sang làn mượt mà
                 let targetX = LANES[currentLane];
-                player.position.x += (targetX - player.position.x) * 0.2;
+                player.position.x += (targetX - player.position.x) * 0.15;
 
-                // Vật lý nhảy / lướt
-                player.position.y += (targetY - player.position.y) * 0.2;
+                // Vật lý nhảy/lướt mượt mà
+                player.position.y += (targetY - player.position.y) * 0.15;
                 
                 if (isJumping && Math.abs(player.position.y - targetY) < 0.1) {
                     targetY = 1.5;
                     isJumping = false;
-                    if(actions['run']) {
-                        actions['jump'].stop();
-                        actions['run'].play();
-                    }
+                    if(actions['run']) { actions['jump'].stop(); actions['run'].play(); }
                 }
                 if (isSliding && Math.abs(player.position.y - targetY) < 0.1) {
                     targetY = 1.5;
                     isSliding = false;
                     player.rotation.x = 0;
-                    if(actions['run']) {
-                        actions['slide'].stop();
-                        actions['run'].play();
-                    }
+                    if(actions['run']) { actions['slide'].stop(); actions['run'].play(); }
                 }
 
-                // Sinh tàu hỏa
-                if (Math.random() < 0.02) spawnTrain();
+                // Sinh tàu hỏa (tần suất vừa phải)
+                if (Math.random() < 0.015) spawnTrain();
 
-                // Di chuyển tàu
+                // Di chuyển tàu hỏa
                 for (let i = obstacles.length - 1; i >= 0; i--) {
                     let obs = obstacles[i];
-                    obs.position.z += gameSpeed * 15; // Tốc độ tàu chạy về phía mình
+                    obs.position.z += currentSpeed * 20; 
 
-                    // Kiểm tra va chạm
-                    if (Math.abs(obs.position.z - player.position.z) < 6 && Math.abs(obs.position.x - player.position.x) < 1.5) {
-                        // Nếu đang nhảy cao hơn tàu hoặc đang lướt qua gầm
-                        if (!(isJumping && player.position.y > 3) && !(isSliding && player.position.y < 1)) {
+                    // Logic va chạm
+                    if (Math.abs(obs.position.z - player.position.z) < 7 && Math.abs(obs.position.x - player.position.x) < 1.5) {
+                        // Nếu đang nhảy đủ cao HOẶC đang lướt đủ thấp thì không sao
+                        if (!(isJumping && player.position.y > 3) && !(isSliding && player.position.y < 1.2)) {
                             isGameOver = true;
                             gameOverEl.style.display = 'block';
                         }
                     }
 
-                    // Xóa tàu khi chạy qua
+                    // Xóa tàu khi đi khuất
                     if (obs.position.z > 20) {
                         scene.remove(obs);
                         obstacles.splice(i, 1);
@@ -271,6 +263,7 @@
         function resetGame() {
             isGameOver = false;
             score = 0;
+            currentSpeed = baseSpeed;
             scoreEl.innerText = "Điểm: 0";
             gameOverEl.style.display = 'none';
             currentLane = 1;
