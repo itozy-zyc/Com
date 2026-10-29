@@ -2,265 +2,178 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Endless Runner Demo</title>
+    <title>Subway Surfers 3D Demo</title>
     <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            background-color: #333;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            font-family: Arial, sans-serif;
+        body { margin: 0; overflow: hidden; background-color: #87CEEB; font-family: Arial; }
+        #score { position: absolute; top: 20px; left: 20px; color: white; font-size: 30px; font-weight: bold; text-shadow: 2px 2px 4px #000; }
+        #game-over { 
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.8); color: white; padding: 30px; text-align: center; border-radius: 10px; display: none;
         }
-        canvas {
-            background: linear-gradient(#87CEEB, #E0F6FF); /* Bầu trời */
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            border-radius: 10px;
-        }
-        #scoreBoard {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            color: white;
-            font-size: 24px;
-            font-weight: bold;
-            text-shadow: 2px 2px 4px #000;
-            pointer-events: none;
-        }
-        #gameOver {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            padding: 20px 40px;
-            border-radius: 10px;
-            text-align: center;
-            display: none;
-        }
-        button {
-            padding: 10px 20px;
-            font-size: 18px;
-            cursor: pointer;
-            margin-top: 10px;
-            background-color: #ff4757;
-            color: white;
-            border: none;
-            border-radius: 5px;
-        }
+        button { padding: 10px 20px; font-size: 20px; cursor: pointer; background: #ff4757; color: white; border: none; border-radius: 5px; margin-top: 10px;}
     </style>
 </head>
 <body>
 
-    <div id="scoreBoard">Điểm: 0</div>
-    
-    <div id="gameOver">
-        <h2>Game Over!</h2>
-        <p>Bạn đã va vào vật cản.</p>
-        <button onclick="resetGame()">Chơi lại</button>
+    <div id="score">Điểm: 0</div>
+    <div id="game-over">
+        <h1>Game Over!</h1>
+        <p>Bạn đã đâm vào tàu hỏa.</p>
+        <button onclick="resetGame()">Chơi Lại</button>
     </div>
 
-    <canvas id="gameCanvas" width="400" height="600"></canvas>
+    <!-- Tải thư viện Three.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 
     <script>
-        const canvas = document.getElementById('gameCanvas');
-        const ctx = canvas.getContext('2d');
-        const scoreElement = document.getElementById('scoreBoard');
-        const gameOverScreen = document.getElementById('gameOver');
+        // 1. KHỞI TẠO CẢNH 3D
+        const scene = new THREE.Scene();
+        scene.background = new THREE.Color(0x87CEEB); // Màu trời xanh
+        scene.fog = new THREE.Fog(0x87CEEB, 20, 100); // Sương mù che khuất phía xa
 
-        // Cấu hình game
-        const LANE_COUNT = 3;
-        const LANE_WIDTH = 100;
-        const PLAYER_WIDTH = 40;
-        const PLAYER_HEIGHT = 70;
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        camera.position.set(0, 5, 10); // Đặt camera phía sau và trên cao
+        camera.lookAt(0, 2, 0);
+
+        const renderer = new THREE.WebGLRenderer({ antialias: true });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
+        // Ánh sáng
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+        scene.add(ambientLight);
+        const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+        dirLight.position.set(10, 20, 10);
+        scene.add(dirLight);
+
+        // 2. TẠO MÔI TRƯỜNG (ĐƯỜNG RAY)
+        const trackWidth = 12;
+        const trackLength = 1000;
+        const laneWidth = 4;
         
-        // Tính toán vị trí 3 làn đường
-        const startX = (canvas.width - (LANE_COUNT * LANE_WIDTH)) / 2;
-        const lanes = [
-            startX + LANE_WIDTH / 2,
-            startX + LANE_WIDTH + LANE_WIDTH / 2,
-            startX + LANE_WIDTH * 2 + LANE_WIDTH / 2
-        ];
+        // Mặt đất
+        const floorGeo = new THREE.PlaneGeometry(trackWidth, trackLength);
+        const floorMat = new THREE.MeshLambertMaterial({ color: 0x555555 });
+        const floor = new THREE.Mesh(floorGeo, floorMat);
+        floor.rotation.x = -Math.PI / 2;
+        floor.position.z = -trackLength / 2 + 20; // Kéo dài về phía trước
+        scene.add(floor);
 
-        let player = {
-            x: lanes[1], // Bắt đầu ở làn giữa
-            y: canvas.height - 120,
-            width: PLAYER_WIDTH,
-            height: PLAYER_HEIGHT,
-            currentLane: 1,
-            targetX: lanes[1]
-        };
+        // Vạch kẻ làn đường
+        for (let i = -1; i <= 1; i+=2) {
+            const lineGeo = new THREE.PlaneGeometry(0.2, trackLength);
+            const lineMat = new THREE.MeshLambertMaterial({ color: 0xaaaaaa });
+            const line = new THREE.Mesh(lineGeo, lineMat);
+            line.rotation.x = -Math.PI / 2;
+            line.position.set(i * laneWidth/2, 0.01, -trackLength / 2 + 20);
+            scene.add(line);
+        }
 
+        // 3. TẠO NHÂN VẬT (Player)
+        const playerGeo = new THREE.BoxGeometry(1.5, 3, 1.5); // Khối hộp thay cho người
+        const playerMat = new THREE.MeshLambertMaterial({ color: 0x3498db }); // Màu xanh
+        const player = new THREE.Mesh(playerGeo, playerMat);
+        player.position.y = 1.5; // Đặt trên mặt đất
+        player.position.z = 5;
+        scene.add(player);
+
+        const LANES = [-laneWidth, 0, laneWidth]; // Tọa độ X của 3 làn
+        let currentLane = 1; // Bắt đầu ở giữa
+
+        // 4. TẠO VẬT CẢN (TÀU HỎA)
         let obstacles = [];
-        let score = 0;
-        let gameSpeed = 5;
-        let isGameOver = false;
-        let frameCount = 0;
+        const obstacleGeo = new THREE.BoxGeometry(2.5, 4, 8); // Hình tàu hỏa
+        const obstacleMat = new THREE.MeshLambertMaterial({ color: 0xff4757 }); // Màu đỏ
 
-        // Xử lý phím bấm
+        function spawnObstacle() {
+            const lane = Math.floor(Math.random() * 3); // Random 1 trong 3 làn
+            const obs = new THREE.Mesh(obstacleGeo, obstacleMat);
+            obs.position.set(LANES[lane], 2, -100); // Sinh ra ở phía xa
+            scene.add(obs);
+            obstacles.push(obs);
+        }
+
+        // 5. LOGIC GAME
+        let score = 0;
+        let gameSpeed = 0.5;
+        let isGameOver = false;
+        let scoreDisplay = document.getElementById('score');
+        let gameOverScreen = document.getElementById('game-over');
+
+        // Điều khiển
         document.addEventListener('keydown', (e) => {
             if (isGameOver) return;
-
-            if ((e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') && player.currentLane > 0) {
-                player.currentLane--;
-                player.targetX = lanes[player.currentLane];
-            } else if ((e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') && player.currentLane < 2) {
-                player.currentLane++;
-                player.targetX = lanes[player.currentLane];
+            if ((e.key === 'ArrowLeft' || e.key === 'a') && currentLane > 0) {
+                currentLane--;
+            } else if ((e.key === 'ArrowRight' || e.key === 'd') && currentLane < 2) {
+                currentLane++;
             }
         });
 
-        // Hàm tạo vật cản ngẫu nhiên
-        function spawnObstacle() {
-            const laneIndex = Math.floor(Math.random() * LANE_COUNT);
-            obstacles.push({
-                x: lanes[laneIndex] - 25, // Căn giữa vật cản
-                y: -100,
-                width: 50,
-                height: 50,
-                lane: laneIndex
-            });
+        // Hiệu ứng di chuyển mượt
+        function updatePlayer() {
+            const targetX = LANES[currentLane];
+            player.position.x += (targetX - player.position.x) * 0.2;
         }
 
-        // Vẽ hình chữ nhật bo góc cho đẹp
-        function drawRoundedRect(x, y, width, height, radius, color) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.fillStyle = color;
-            ctx.fill();
-            ctx.closePath();
-        }
+        // Vòng lặp Render (60fps)
+        function animate() {
+            requestAnimationFrame(animate);
 
-        // Hàm vẽ chính
-        function draw() {
-            // Xóa màn hình
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // 1. Vẽ đường ray (3 làn)
-            ctx.fillStyle = '#555';
-            ctx.fillRect(startX, 0, LANE_WIDTH * LANE_COUNT, canvas.height);
-            
-            ctx.strokeStyle = '#888';
-            ctx.lineWidth = 4;
-            for (let i = 0; i <= LANE_COUNT; i++) {
-                ctx.beginPath();
-                ctx.moveTo(startX + i * LANE_WIDTH, 0);
-                ctx.lineTo(startX + i * LANE_WIDTH, canvas.height);
-                ctx.stroke();
-            }
-
-            // Hiệu ứng đường chạy (thanh ngang)
-            ctx.fillStyle = '#444';
-            for (let i = 0; i < canvas.height; i += 40) {
-                let offset = (frameCount * gameSpeed) % 40;
-                ctx.fillRect(startX, i + offset, LANE_WIDTH * LANE_COUNT, 10);
-            }
-
-            // 2. Vẽ vật cản
-            ctx.fillStyle = '#ff4757';
-            obstacles.forEach(obs => {
-                drawRoundedRect(obs.x, obs.y, obs.width, obs.height, 5, '#ff4757');
-            });
-
-            // 3. Vẽ nhân vật (Player)
-            // Nội suy vị trí để di chuyển mượt mà
-            player.x += (player.targetX - player.x) * 0.2;
-            
-            // Vẽ thân
-            drawRoundedRect(player.x - player.width/2, player.y, player.width, player.height, 10, '#3498db');
-            
-            // Vẽ đầu
-            ctx.beginPath();
-            ctx.arc(player.x, player.y - 15, 15, 0, Math.PI * 2);
-            ctx.fillStyle = '#f1c40f';
-            ctx.fill();
-            ctx.closePath();
-        }
-
-        // Hàm cập nhật logic game
-        function update() {
-            if (isGameOver) return;
-            
-            frameCount++;
-
-            // Tăng điểm theo thời gian
-            if (frameCount % 10 === 0) {
-                score++;
-                scoreElement.innerText = "Điểm: " + score;
-            }
-
-            // Tăng tốc độ game dần dần
-            if (frameCount % 600 === 0) {
-                gameSpeed += 0.5;
-            }
-
-            // Tạo vật cản
-            if (frameCount % 80 === 0) {
-                spawnObstacle();
-            }
-
-            // Di chuyển vật cản
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].y += gameSpeed;
-
-                // Xóa vật cản khi ra khỏi màn hình
-                if (obstacles[i].y > canvas.height) {
-                    obstacles.splice(i, 1);
-                }
-
-                // Kiểm tra va chạm (AABB Collision)
-                let obs = obstacles[i];
-                if (
-                    player.x - player.width/2 < obs.x + obs.width &&
-                    player.x + player.width/2 > obs.x &&
-                    player.y < obs.y + obs.height &&
-                    player.y + player.height > obs.y
-                ) {
-                    // Nếu va chạm
-                    isGameOver = true;
-                    gameOverScreen.style.display = 'block';
-                }
-            }
-        }
-
-        // Vòng lặp game
-        function gameLoop() {
-            update();
-            draw();
             if (!isGameOver) {
-                requestAnimationFrame(gameLoop);
+                updatePlayer();
+
+                // Tăng điểm
+                score += 1;
+                if (score % 10 === 0) scoreDisplay.innerText = "Điểm: " + Math.floor(score/10);
+
+                // Sinh vật cản
+                if (Math.random() < 0.02) spawnObstacle();
+
+                // Di chuyển vật cản
+                for (let i = obstacles.length - 1; i >= 0; i--) {
+                    let obs = obstacles[i];
+                    obs.position.z += gameSpeed; // Di chuyển về phía người chơi
+
+                    // Va chạm (Khoảng cách Z và X)
+                    if (Math.abs(obs.position.z - player.position.z) < 4 && Math.abs(obs.position.x - player.position.x) < 1.5) {
+                        isGameOver = true;
+                        gameOverScreen.style.display = 'block';
+                    }
+
+                    // Xóa vật cản khi đi qua màn hình
+                    if (obs.position.z > 10) {
+                        scene.remove(obs);
+                        obstacles.splice(i, 1);
+                    }
+                }
             }
+
+            renderer.render(scene, camera);
         }
 
-        // Reset game
         function resetGame() {
-            player.x = lanes[1];
-            player.targetX = lanes[1];
-            player.currentLane = 1;
-            obstacles = [];
-            score = 0;
-            gameSpeed = 5;
             isGameOver = false;
-            frameCount = 0;
-            scoreElement.innerText = "Điểm: 0";
+            score = 0;
+            scoreDisplay.innerText = "Điểm: 0";
             gameOverScreen.style.display = 'none';
-            gameLoop();
+            currentLane = 1;
+            player.position.x = 0;
+            
+            // Xóa hết vật cản cũ
+            obstacles.forEach(obs => scene.remove(obs));
+            obstacles = [];
         }
+
+        // Xử lý khi thay đổi kích thước màn hình
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
         // Bắt đầu game
-        gameLoop();
+        animate();
     </script>
 </body>
 </html>
