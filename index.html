@@ -34,6 +34,7 @@
             gap: 8px;
             font-weight: bold;
             font-size: 16px;
+            cursor: pointer;
         }
         .logo-icon {
             background: #ffcc00;
@@ -57,11 +58,17 @@
             cursor: pointer;
         }
 
-        /* Container */
+        /* Container & Views */
         .container {
             padding: 16px;
             max-width: 600px;
             margin: 0 auto;
+        }
+        .view-section {
+            display: none;
+        }
+        .view-section.active {
+            display: block;
         }
 
         /* Hero Section */
@@ -165,6 +172,7 @@
             color: #2563eb;
             text-decoration: none;
             font-weight: 600;
+            cursor: pointer;
         }
         .stats-grid {
             display: grid;
@@ -185,7 +193,7 @@
             color: #777;
         }
 
-        /* Section Quick Access */
+        /* Quick Access */
         .section-title {
             font-size: 12px;
             color: #888;
@@ -211,6 +219,7 @@
             flex-direction: column;
             gap: 6px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+            cursor: pointer;
         }
         .quick-card .q-title {
             font-weight: bold;
@@ -221,7 +230,153 @@
             color: #777;
         }
 
-        /* Footer info */
+        /* GDV List Page Styling */
+        .filter-box {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 14px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .search-input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 12px;
+        }
+        .filter-tags-scroll {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding-bottom: 5px;
+        }
+        .ftag {
+            background: #f3f4f6;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            white-space: nowrap;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .ftag.active {
+            background: #fef3c7;
+            border-color: #f59e0b;
+            color: #b45309;
+            font-weight: bold;
+        }
+        .gdv-card-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .gdv-card {
+            background: #fff;
+            border: 1px solid #eee;
+            border-radius: 14px;
+            padding: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+        .gdv-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+        .gdv-badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .gdv-badge.admin { background: #fee2e2; color: #dc2626; }
+        .gdv-badge.vip { background: #fef3c7; color: #d97706; }
+        .gdv-badge.normal { background: #f3f4f6; color: #4b5563; }
+        
+        .gdv-profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        .gdv-avatar {
+            width: 36px;
+            height: 36px;
+            background: #ccc;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .gdv-name {
+            font-size: 13px;
+            font-weight: bold;
+        }
+        .gdv-rating {
+            font-size: 11px;
+            color: #f59e0b;
+        }
+        .gdv-stats {
+            font-size: 11px;
+            color: #666;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .gdv-price {
+            font-size: 13px;
+            font-weight: bold;
+            color: #059669;
+            border-top: 1px solid #f9f9f9;
+            padding-top: 6px;
+        }
+
+        /* Modal Menu Slide */
+        .drawer {
+            position: fixed;
+            top: 0;
+            right: -100%;
+            width: 80%;
+            max-width: 300px;
+            height: 100%;
+            background: #fff;
+            box-shadow: -4px 0 15px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 20px;
+        }
+        .drawer.open { right: 0; }
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .drawer-item {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 14px;
+            cursor: pointer;
+            color: #333;
+            font-weight: 500;
+        }
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 999;
+            display: none;
+        }
+        .overlay.show { display: block; }
+
+        /* Footer */
         footer {
             background: #fff;
             border-top: 1px solid #eee;
@@ -230,30 +385,21 @@
             font-size: 12px;
             color: #666;
         }
-        footer .footer-brand {
-            font-weight: bold;
-            color: #111;
-            margin-bottom: 8px;
-        }
-        footer .footer-desc {
-            line-height: 1.5;
-            margin-bottom: 15px;
-        }
         .footer-links {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 10px;
-            margin-bottom: 20px;
+            margin: 15px 0;
         }
-        .footer-links a {
+        .footer-links a, .footer-links div {
             background: #f9f9f9;
             padding: 10px;
             border-radius: 8px;
-            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            border: 1px solid #eee;
             color: #333;
             font-weight: 500;
-            border: 1px solid #eee;
-            text-align: center;
         }
         .author-box {
             background: #fffbeb;
@@ -264,107 +410,196 @@
             justify-content: space-between;
             align-items: center;
         }
-        .author-box a {
-            color: #d97706;
-            font-weight: bold;
-            text-decoration: none;
-        }
     </style>
 </head>
 <body>
 
-    <!-- Header -->
+    <!-- Header Chung -->
     <header>
-        <div class="logo-area">
+        <div class="logo-area" onclick="switchView('home')">
             <div class="logo-icon">✓</div>
             <span>checkantoan.vn</span>
         </div>
         <div class="header-right">
-            <span>🌙</span>
-            <button class="menu-btn">☰</button>
+            <span style="cursor: pointer;">🌙</span>
+            <button class="menu-btn" onclick="toggleDrawer()">☰</button>
         </div>
     </header>
 
-    <!-- Main Content -->
-    <div class="container">
-        
-        <!-- Hero Section -->
-        <div class="badge-top">Nền tảng trung gian uy tín</div>
-        <div class="hero-title">Giao dịch an toàn.<br>Mua bán <span>yên tâm</span>.</div>
-        <div class="hero-desc">Kiểm tra hồ sơ, mức bảo hiểm và đánh giá của Giao dịch viên trước khi giao dịch. Khu trao đổi là quyền lợi bổ sung dành cho GDV đang hoạt động.</div>
-        
-        <div class="hero-tags">
-            <div>🛡️ Hồ sơ rõ ràng</div>
-            <div>📜 Bảo hiểm minh bạch</div>
-            <div>⭐ Đánh giá độ duyệt</div>
-        </div>
-
-        <!-- Buttons -->
-        <div class="action-buttons">
-            <button class="btn btn-yellow">Kiểm tra GDV</button>
-            <button class="btn btn-outline">Khu trao đổi</button>
-        </div>
-
-        <!-- Balance / Insurance Box -->
-        <div class="balance-box">
-            <div class="balance-header">
-                <span>🛡️</span> <strong>TỔNG BẢO HIỂM GDV</strong>
+    <!-- TRANG CHỦ -->
+    <div id="view-home" class="view-section active">
+        <div class="container">
+            <div class="badge-top">Nền tảng trung gian uy tín</div>
+            <div class="hero-title">Giao dịch an toàn.<br>Mua bán <span>yên tâm</span>.</div>
+            <div class="hero-desc">Kiểm tra hồ sơ, mức bảo hiểm và đánh giá của Giao dịch viên trước khi giao dịch. Khu trao đổi là quyền lợi bổ sung dành cho GDV đang hoạt động.</div>
+            
+            <div class="hero-tags">
+                <div>🛡️ Hồ sơ rõ ràng</div>
+                <div>📜 Bảo hiểm minh bạch</div>
+                <div>⭐ Đánh giá độ duyệt</div>
             </div>
-            <div class="balance-amount">14.500.000 VND</div>
-            <div class="balance-desc">Công ty các hồ sơ GDV đang được hiển thị công khai.</div>
-            <a href="#" class="balance-link">Xem danh sách kiểm tra →</a>
 
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="number">18</div>
-                    <div class="label">Giao dịch viên</div>
+            <div class="action-buttons">
+                <button class="btn btn-yellow" onclick="switchView('gdv')">Kiểm tra GDV</button>
+                <button class="btn btn-outline" onclick="switchView('trade')">Khu trao đổi</button>
+            </div>
+
+            <!-- Tổng Bảo Hiểm Box -->
+            <div class="balance-box">
+                <div class="balance-header">
+                    <span>🛡️</span> <strong>TỔNG BẢO HIỂM GDV</strong>
                 </div>
-                <div class="stat-item">
-                    <div class="number">18</div>
-                    <div class="label">Đảm giá đã duyệt</div>
+                <div class="balance-amount">14.500.000 VND</div>
+                <div class="balance-desc">Công ty các hồ sơ GDV đang được hiển thị công khai.</div>
+                <span class="balance-link" onclick="switchView('gdv')">Xem danh sách kiểm tra →</span>
+
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="number">18</div>
+                        <div class="label">Giao dịch viên</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">18</div>
+                        <div class="label">Đảm giá đã duyệt</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">4.8</div>
+                        <div class="label">Điểm trung bình</div>
+                    </div>
                 </div>
-                <div class="stat-item">
-                    <div class="number">4.8</div>
-                    <div class="label">Điểm trung bình</div>
+            </div>
+
+            <div class="section-title">Truy cập nhanh</div>
+            <div class="section-title" style="font-size: 14px; color: #111; margin-top: -6px; margin-bottom: 12px; font-weight: 800;">Đi đúng nơi cần kiểm tra</div>
+
+            <div class="quick-grid">
+                <div class="quick-card" onclick="switchView('gdv')">
+                    <div class="q-title">Danh sách GDV</div>
+                    <div class="q-desc">Kiểm tra cọc, hạng và đánh giá</div>
+                </div>
+                <div class="quick-card" onclick="switchView('trade')">
+                    <div class="q-title">Khu trao đổi</div>
+                    <div class="q-desc">Tài khoản và vật phẩm game</div>
+                </div>
+                <div class="quick-card" onclick="alert('Đang mở 4 cộng đồng liên kết!')">
+                    <div class="q-title">Cộng đồng</div>
+                    <div class="q-desc">4 kênh đang hiển thị</div>
+                </div>
+                <div class="quick-card" onclick="alert('Chuyển hướng đến hệ thống hỗ trợ Zalo Admin!')">
+                    <div class="q-title">Liên hệ Admin</div>
+                    <div class="q-desc">Mở đúng kênh hỗ trợ</div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Truy cập nhanh -->
-        <div class="section-title">Truy cập nhanh</div>
-        <div class="section-title" style="font-size: 14px; color: #111; margin-top: -6px; margin-bottom: 12px; font-weight: 800;">Đi đúng nơi cần kiểm tra</div>
+    <!-- TRANG DANH SÁCH GIAO DỊCH VIÊN (GDV) -->
+    <div id="view-gdv" class="view-section">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <button onclick="switchView('home')" style="background:none; border:none; font-size: 16px; cursor: pointer;">← Trang chủ</button>
+                <h2 style="font-size: 18px;">Danh sách Giao dịch viên</h2>
+            </div>
+            
+            <div class="filter-box">
+                <input type="text" class="search-input" placeholder="🔍 Tìm theo tên, mã GDV hoặc số điện thoại...">
+                <div class="filter-tags-scroll">
+                    <div class="ftag active">Tất cả</div>
+                    <div class="ftag">💎 Kim cương</div>
+                    <div class="ftag">⭐ Vàng</div>
+                    <div class="ftag">🛡️ Bạc</div>
+                </div>
+            </div>
 
-        <div class="quick-grid">
-            <a href="#" class="quick-card">
-                <div class="q-title">Danh sách GDV</div>
-                <div class="q-desc">Kiểm tra cọc, hạng và đánh giá</div>
-            </a>
-            <a href="#" class="quick-card">
-                <div class="q-title">Khu trao đổi</div>
-                <div class="q-desc">Tài khoản và vật phẩm game</div>
-            </a>
-            <a href="#" class="quick-card">
-                <div class="q-title">Cộng đồng</div>
-                <div class="q-desc">4 kênh đang hiển thị</div>
-            </a>
-            <a href="#" class="quick-card">
-                <div class="q-title">Liên hệ Admin</div>
-                <div class="q-desc">Mở đúng kênh hỗ trợ</div>
-            </a>
+            <div class="gdv-card-grid">
+                <!-- GDV 1 -->
+                <div class="gdv-card">
+                    <div class="gdv-top">
+                        <span class="gdv-badge admin">ADMIN</span>
+                        <span style="font-size: 11px; color:#888;">GDV #1</span>
+                    </div>
+                    <div class="gdv-profile">
+                        <div class="gdv-avatar" style="background:#dc2626;">Đ</div>
+                        <div>
+                            <div class="gdv-name">Đỗ Quốc Nam</div>
+                            <div class="gdv-rating">★★★★★ (5.0)</div>
+                        </div>
+                    </div>
+                    <div class="gdv-stats">
+                        <span>📦 0 Account</span>
+                        <span>🏷️ 1 Item</span>
+                    </div>
+                    <div class="gdv-price">0 VND</div>
+                </div>
+
+                <!-- GDV 2 -->
+                <div class="gdv-card">
+                    <div class="gdv-top">
+                        <span class="gdv-badge vip">HẠNG KIM CƯƠNG</span>
+                        <span style="font-size: 11px; color:#888;">GDV #2</span>
+                    </div>
+                    <div class="gdv-profile">
+                        <div class="gdv-avatar" style="background:#2563eb;">V</div>
+                        <div>
+                            <div class="gdv-name">Vương Đình</div>
+                            <div class="gdv-rating">★★★★★ (5.0)</div>
+                        </div>
+                    </div>
+                    <div class="gdv-stats">
+                        <span>📦 0 Account</span>
+                        <span>🏷️ 0 Item</span>
+                    </div>
+                    <div class="gdv-price">3.000.000 VND</div>
+                </div>
+            </div>
         </div>
+    </div>
 
+    <!-- TRANG KHU TRAO ĐỔI -->
+    <div id="view-trade" class="view-section">
+        <div class="container">
+            <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 15px;">
+                <button onclick="switchView('home')" style="background:none; border:none; font-size: 16px; cursor: pointer;">← Trang chủ</button>
+                <h2 style="font-size: 18px;">Khu trao đổi</h2>
+            </div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 15px;">Nơi bạn có thể lựa chọn tài khoản hoặc vật phẩm game phù hợp với nhu cầu.</p>
+            
+            <div class="quick-grid">
+                <div class="quick-card" onclick="alert('Đang hiển thị kho Tài khoản Free Fire')">
+                    <div class="q-title">Free Fire</div>
+                    <div class="q-desc">Tài khoản đã đăng trong kho</div>
+                </div>
+                <div class="quick-card" onclick="alert('Đang hiển thị kho Tài khoản Liên Quân')">
+                    <div class="q-title">Liên Quân Mobile</div>
+                    <div class="q-desc">Tài khoản đã đăng trong kho</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu Drawer (Trượt bên phải) -->
+    <div class="overlay" id="overlay" onclick="toggleDrawer()"></div>
+    <div class="drawer" id="drawer">
+        <div class="drawer-header">
+            <span>Điều hướng</span>
+            <span style="cursor: pointer;" onclick="toggleDrawer()">✕</span>
+        </div>
+        <div class="drawer-item" onclick="switchView('home'); toggleDrawer();">Trang chủ</div>
+        <div class="drawer-item" onclick="switchView('gdv'); toggleDrawer();">Giao dịch viên</div>
+        <div class="drawer-item" onclick="switchView('trade'); toggleDrawer();">Khu trao đổi</div>
+        <div class="drawer-item" onclick="alert('Chuyển hướng đến form Đăng nhập Admin/CTV!')">Đăng nhập Admin</div>
     </div>
 
     <!-- Footer -->
     <footer>
-        <div class="footer-brand">checkantoan.vn</div>
-        <div class="footer-desc">Nền tảng trưng bày tài khoản, vật phẩm game và hồ sơ giao dịch viên.<br>© 2026 Checkantoan.vn. Giao diện & phát triển website bởi **Đỗ Quốc Nam** (hoặc Tạ Đăng Dương theo yêu cầu).</div>
+        <div style="font-weight: bold; color: #111; margin-bottom: 6px;">checkantoan.vn</div>
+        <div style="line-height: 1.4; color: #666;">Nền tảng trưng bày tài khoản, vật phẩm game và hồ sơ giao dịch viên. Phát triển bởi Đỗ Quốc Nam.</div>
         
-        <div class="section-title" style="margin-bottom: 10px;">Liên kết</div>
         <div class="footer-links">
-            <a href="#">Trang chủ</a>
-            <a href="#">Khu trao đổi</a>
-            <a href="#">Giao dịch viên</a>
+            <div onclick="switchView('home')">Trang chủ</div>
+            <div onclick="switchView('trade')">Khu trao đổi</div>
+            <div onclick="switchView('gdv')">Giao dịch viên</div>
+            <div onclick="alert('Chính sách bảo hiểm GDV')">Điều khoản</div>
         </div>
 
         <div class="author-box">
@@ -372,9 +607,26 @@
                 <div style="font-size: 11px; color: #888;">LIÊN HỆ PHÁT TRIỂN WEBSITE</div>
                 <div style="font-weight: bold; color: #111;">Đỗ Quốc Nam</div>
             </div>
-            <a href="#">Zalo ↗</a>
+            <a href="https://zalo.me" target="_blank" style="color: #d97706; font-weight: bold; text-decoration: none;">Zalo ↗</a>
         </div>
     </footer>
 
+    <!-- JavaScript Xử Lý Chức Năng -->
+    <script>
+        // Chuyển đổi qua lại các trang (Views) mượt mà
+        function switchView(viewName) {
+            document.querySelectorAll('.view-section').forEach(el => {
+                el.classList.remove('active');
+            });
+            document.getElementById('view-' + viewName).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // Bật tắt Menu trượt (Drawer)
+        function toggleDrawer() {
+            document.getElementById('drawer').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('show');
+        }
+    </script>
 </body>
 </html>
